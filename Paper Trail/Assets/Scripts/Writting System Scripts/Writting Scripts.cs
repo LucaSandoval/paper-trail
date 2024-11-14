@@ -8,9 +8,10 @@ public class WrittingScripts : MonoBehaviour
     public Color brushColor = Color.black;
     public int brushSize = 10;
     public float splotchFactor = 1.2f;
-    public float minSpeedScale = 0.8f;  // Minimum brush scale at high speeds
-    public float maxSpeed = 1000f;      // Speed at which brush reaches minimum scale
-    public float smoothingFactor = 0.3f; // Lower values = more smoothing
+    public float minSpeedScale = 0.8f;
+    public float maxSpeed = 1000f;
+    public float smoothingFactor = 0.3f;
+    public Texture2D referenceTexture;
 
     private Texture2D drawingTexture;
     private Vector2? previousDrawPosition = null;
@@ -92,16 +93,15 @@ public class WrittingScripts : MonoBehaviour
             Vector2 pos = Vector2.Lerp(start, end, t);
 
             float taperFactor = 1f;
-            if (t < 0.2f) // Start taper
+            if (t < 0.2f) 
             {
                 taperFactor = Mathf.SmoothStep(0.8f, 1f, t * 5f);
             }
-            else if (t > 0.8f) // End taper
+            else if (t > 0.8f)
             {
                 taperFactor = Mathf.SmoothStep(0.8f, 1f, (1f - t) * 5f);
             }
 
-            // Combine speed scaling with taper
             int currentBrushSize = Mathf.Max(1, (int)(brushSize * speedScale * taperFactor));
             DrawAtPosition((int)pos.x, (int)pos.y, currentBrushSize);
         }
@@ -111,7 +111,6 @@ public class WrittingScripts : MonoBehaviour
 
     void DrawAtPosition(int x, int y, int customBrushSize)
     {
-        // Use squared distance comparison for better performance
         int brushSizeSquared = customBrushSize * customBrushSize;
 
         for (int i = -customBrushSize; i <= customBrushSize; i++)
@@ -127,11 +126,11 @@ public class WrittingScripts : MonoBehaviour
                         newY >= 0 && newY < drawingTexture.height)
                     {
 
-                        float distanceFromCenter = (i * i + j * j) / (float)brushSizeSquared; // Smooth edges of stroke
+                        float distanceFromCenter = (i * i + j * j) / (float)brushSizeSquared;
                         Color pixelColor = brushColor;
                         pixelColor.a = Mathf.Lerp(1f, 0.7f, distanceFromCenter);
 
-                        Color existingColor = drawingTexture.GetPixel(newX, newY); //Blends with existing pixel colors on paper
+                        Color existingColor = drawingTexture.GetPixel(newX, newY);
                         drawingTexture.SetPixel(newX, newY, Color.Lerp(existingColor, pixelColor, pixelColor.a));
                     }
                 }
@@ -155,5 +154,58 @@ public class WrittingScripts : MonoBehaviour
         }
         drawingTexture.SetPixels(clearPixels);
         drawingTexture.Apply();
+    }
+
+    public float CompareTextures(Texture2D texture1, Texture2D texture2)
+    {
+        if (texture1.width != texture2.width || texture1.height != texture2.height)
+        {
+            Debug.LogError("Textures are not the same size.");
+            return 0f;
+        }
+
+        int similarPixelCount = 0;
+        int totalPixelCount = texture1.width * texture1.height;
+
+        for (int x = 0; x < texture1.width; x++)
+        {
+            for (int y = 0; y < texture1.height; y++)
+            {
+                Color color1 = texture1.GetPixel(x, y);
+                Color color2 = texture2.GetPixel(x, y);
+
+                float tolerance = 0.1f;
+                if (Mathf.Abs(color1.r - color2.r) < tolerance &&
+                    Mathf.Abs(color1.g - color2.g) < tolerance &&
+                    Mathf.Abs(color1.b - color2.b) < tolerance)
+                {
+                    similarPixelCount++;
+                }
+            }
+        }
+
+        return (float)similarPixelCount / totalPixelCount;
+    }
+
+    public void CompareSignatures()
+    {
+        //SaveTextureToFile(drawingTexture, "NewSignature.png");
+        float similarityScore = CompareTextures(drawingTexture, referenceTexture);
+        Debug.Log("Similarity: " + (similarityScore * 100f) + "%");
+    }
+
+    public void SaveTextureToFile(Texture2D texture, string fileName)
+    {
+        // Encode texture into PNG format
+        byte[] bytes = texture.EncodeToPNG();
+
+        // Define the path to the Downloads folder
+        string downloadsPath = System.Environment.GetFolderPath(System.Environment.SpecialFolder.UserProfile) + "\\Downloads";
+        string filePath = System.IO.Path.Combine(downloadsPath, fileName);
+
+        // Write the byte array to the file
+        System.IO.File.WriteAllBytes(filePath, bytes);
+
+        Debug.Log("Texture saved to: " + filePath);
     }
 }
