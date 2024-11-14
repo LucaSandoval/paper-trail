@@ -1020,7 +1020,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   quadRenderer: {fileID: 1140782007}
   brushColor: {r: 0, g: 0, b: 0, a: 1}
-  brushSize: 6
+  brushSize: 3
   splotchFactor: 0.6
   minSpeedScale: 0.8
   maxSpeed: 1000

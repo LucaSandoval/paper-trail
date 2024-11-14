@@ -6,7 +6,7 @@ public class WrittingScripts : MonoBehaviour
 {
     public Renderer quadRenderer;
     public Color brushColor = Color.black;
-    public int brushSize = 10;
+    public int brushSize = 5;
     public float splotchFactor = 1.2f;
     public float minSpeedScale = 0.8f;
     public float maxSpeed = 1000f;
