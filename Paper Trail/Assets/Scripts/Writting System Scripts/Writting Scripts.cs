@@ -158,14 +158,9 @@ public class WrittingScripts : MonoBehaviour
 
     public float CompareTextures(Texture2D texture1, Texture2D texture2)
     {
-        if (texture1.width != texture2.width || texture1.height != texture2.height)
-        {
-            Debug.LogError("Textures are not the same size.");
-            return 0f;
-        }
-
-        int similarPixelCount = 0;
-        int totalPixelCount = texture1.width * texture1.height;
+        int matchedBlackPixels = 0;
+        int totalBlackPixelsReference = 0;
+        float blackPixelThreshold = 0.1f; 
 
         for (int x = 0; x < texture1.width; x++)
         {
@@ -174,18 +169,22 @@ public class WrittingScripts : MonoBehaviour
                 Color color1 = texture1.GetPixel(x, y);
                 Color color2 = texture2.GetPixel(x, y);
 
-                float tolerance = 0.1f;
-                if (Mathf.Abs(color1.r - color2.r) < tolerance &&
-                    Mathf.Abs(color1.g - color2.g) < tolerance &&
-                    Mathf.Abs(color1.b - color2.b) < tolerance)
-                {
-                    similarPixelCount++;
-                }
+                bool isBlack1 = color1.r < blackPixelThreshold && color1.g < blackPixelThreshold && color1.b < blackPixelThreshold;
+                bool isBlack2 = color2.r < blackPixelThreshold && color2.g < blackPixelThreshold && color2.b < blackPixelThreshold;
+
+                // Count total black pixels in reference texture
+                if (isBlack1)
+                    totalBlackPixelsReference++;
+
+                // Increment if pixels from both images are black
+                if (isBlack1 && isBlack2)
+                    matchedBlackPixels++;
             }
         }
-
-        return (float)similarPixelCount / totalPixelCount;
+        
+        return (float)matchedBlackPixels / totalBlackPixelsReference;
     }
+
 
     public void CompareSignatures()
     {
