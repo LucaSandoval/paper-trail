@@ -198,7 +198,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
+  - {fileID: 2100000, guid: f79076653ec5b4ef99a99b8c0c7b3d28, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -435,6 +435,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5892148460130316694, guid: 50fedb2549891804dbbfcaf476176034, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 2ebe737cc07ac4de0b31a9c6d8371c47, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects:
@@ -1020,7 +1024,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   quadRenderer: {fileID: 1140782007}
   brushColor: {r: 0, g: 0, b: 0, a: 1}
-  brushSize: 3
+  brushSize: 5
   splotchFactor: 0.6
   minSpeedScale: 0.8
   maxSpeed: 1000
@@ -1169,6 +1173,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: -108.778
       objectReference: {fileID: 0}
+    - target: {fileID: 8312821475819652741, guid: 3db2997c38ab22e4086c5375cfbd0d19, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 9e2c07b274b894bb7b24b0674e304800, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -2224,6 +2232,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: FedoraPrefab
       objectReference: {fileID: 0}
+    - target: {fileID: 6283946795848733042, guid: d2b609b1847d6b34fa1b73dfb3554bc3, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 0afbd3293f5eb47fd9ce9d8b0b300dd0, type: 2}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
