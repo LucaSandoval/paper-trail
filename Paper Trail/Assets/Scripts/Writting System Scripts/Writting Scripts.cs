@@ -21,9 +21,37 @@ public class WrittingScripts : MonoBehaviour
 
     void Start()
     {
-        drawingTexture = new Texture2D(512, 512, TextureFormat.RGBA32, false);
+        // Get the existing texture from the material
+        Texture existingTexture = quadRenderer.material.mainTexture;
+
+        // Create a new texture with the same dimensions
+        drawingTexture = new Texture2D(existingTexture.width, existingTexture.height, TextureFormat.RGBA32, false);
         drawingTexture.filterMode = FilterMode.Point;
-        ClearTexture();
+
+        // Create a temporary RenderTexture to copy the existing texture
+        RenderTexture tempRT = RenderTexture.GetTemporary(
+            existingTexture.width,
+            existingTexture.height,
+            0,
+            RenderTextureFormat.Default,
+            RenderTextureReadWrite.Linear
+        );
+
+        // Copy the existing texture to the temporary RenderTexture
+        Graphics.Blit(existingTexture, tempRT);
+
+        // Store the active RenderTexture
+        RenderTexture previousRT = RenderTexture.active;
+
+        // Set the temporary RenderTexture as active
+        RenderTexture.active = tempRT;
+
+        // Copy the pixels from the RenderTexture to our new texture
+        drawingTexture.ReadPixels(new Rect(0, 0, tempRT.width, tempRT.height), 0, 0);
+        drawingTexture.Apply();
+
+        RenderTexture.active = previousRT;
+        RenderTexture.ReleaseTemporary(tempRT);
         quadRenderer.material.mainTexture = drawingTexture;
     }
 
@@ -93,7 +121,7 @@ public class WrittingScripts : MonoBehaviour
             Vector2 pos = Vector2.Lerp(start, end, t);
 
             float taperFactor = 1f;
-            if (t < 0.2f) 
+            if (t < 0.2f)
             {
                 taperFactor = Mathf.SmoothStep(0.8f, 1f, t * 5f);
             }
@@ -125,7 +153,6 @@ public class WrittingScripts : MonoBehaviour
                     if (newX >= 0 && newX < drawingTexture.width &&
                         newY >= 0 && newY < drawingTexture.height)
                     {
-
                         float distanceFromCenter = (i * i + j * j) / (float)brushSizeSquared;
                         Color pixelColor = brushColor;
                         pixelColor.a = Mathf.Lerp(1f, 0.7f, distanceFromCenter);
@@ -147,13 +174,26 @@ public class WrittingScripts : MonoBehaviour
 
     public void ClearTexture()
     {
-        Color[] clearPixels = new Color[drawingTexture.width * drawingTexture.height];
-        for (int i = 0; i < clearPixels.Length; i++)
-        {
-            clearPixels[i] = Color.white;
-        }
-        drawingTexture.SetPixels(clearPixels);
+        // Get the existing texture from the material
+        Texture originalTexture = quadRenderer.material.GetTexture("_MainTex");
+
+        // Create a temporary RenderTexture
+        RenderTexture tempRT = RenderTexture.GetTemporary(
+            originalTexture.width,
+            originalTexture.height,
+            0,
+            RenderTextureFormat.Default,
+            RenderTextureReadWrite.Linear
+        );
+
+        // Copy the original texture to the temporary RenderTexture
+        Graphics.Blit(originalTexture, tempRT);
+        RenderTexture previousRT = RenderTexture.active;
+        RenderTexture.active = tempRT;
+        drawingTexture.ReadPixels(new Rect(0, 0, tempRT.width, tempRT.height), 0, 0);
         drawingTexture.Apply();
+        RenderTexture.active = previousRT;
+        RenderTexture.ReleaseTemporary(tempRT);
     }
 
     public float CompareTextures(Texture2D texture1, Texture2D texture2)
@@ -208,3 +248,6 @@ public class WrittingScripts : MonoBehaviour
         Debug.Log("Texture saved to: " + filePath);
     }
 }
+
+
+
