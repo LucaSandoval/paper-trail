@@ -19,6 +19,13 @@ public class WrittingScripts : MonoBehaviour
     private float lastDrawTime;
     private Vector2 lastVelocity = Vector2.zero;
 
+    //AudioChangeOnWriting
+    public AudioSource WritingSFX; 
+    private float minPitch = 0.9f;  
+    private float maxPitch = 1.1f;  
+    private float pitchSpeedFactor = 0.01f; 
+
+
     void Start()
     {
         // Get the existing texture from the material
@@ -83,6 +90,17 @@ public class WrittingScripts : MonoBehaviour
                     lastVelocity = Vector2.Lerp(lastVelocity, velocity, smoothingFactor);
 
                     DrawImprovedLine(previousDrawPosition.Value, currentPos, lastVelocity.magnitude);
+
+                    //SOUND EFFECTS, play speed change on player's writing speed change
+                    float speed = lastVelocity.magnitude;
+                    float normalizedSpeed = Mathf.Clamp(speed / maxSpeed, 0, 1);
+                    WritingSFX.pitch = Mathf.Lerp(minPitch, maxPitch, normalizedSpeed);
+
+                    if (!WritingSFX.isPlaying)
+                    {
+                        WritingSFX.Play();
+                    }
+
                 }
                 else
                 {
@@ -102,6 +120,7 @@ public class WrittingScripts : MonoBehaviour
             isDrawing = false;
             previousDrawPosition = null;
             lastVelocity = Vector2.zero;
+            WritingSFX.Stop();
         }
     }
 
