@@ -228,7 +228,7 @@ public class WrittingScripts : MonoBehaviour
 
     public void CompareSignatures()
     {
-        SaveTextureToFile(drawingTexture, "NewSignature.png");
+        //SaveTextureToFile(drawingTexture, "NewSignature.png");
         float similarityScore = CompareTextures(drawingTexture, referenceTexture);
         Debug.Log("Similarity: " + (similarityScore * 100f) + "%");
     }
