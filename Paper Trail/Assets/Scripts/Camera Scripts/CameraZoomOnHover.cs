@@ -41,7 +41,8 @@ public class CameraZoomOnHover : MonoBehaviour
                 {
                     currentObject = hitObject; // Update the current object
                     StopAllCoroutines();      // Stop any ongoing zoom animations
-                    StartCoroutine(ZoomToTarget(currentObject.transform.position));
+                    Vector3 targPos = CalculateOverheadPosition(currentObject.transform);
+                    StartCoroutine(ZoomToTarget(targPos, 1f));
                 }
             }
             else if (currentObject != null)
@@ -55,40 +56,58 @@ public class CameraZoomOnHover : MonoBehaviour
         
     }
 
-    private IEnumerator ZoomToTarget(Vector3 focusPoint)
+    private IEnumerator ZoomToTarget(Vector3 focusPoint, float duration = 1f)
     {
         isZoomingIn = true;
+        float elapsedTime = 0f;
 
-        // Store the starting position and rotation of the camera
         Vector3 startPosition = mainCamera.transform.position;
         Quaternion startRotation = mainCamera.transform.rotation;
+        float startFOV = mainCamera.fieldOfView;
 
-        // Calculate the target position and target rotation
-        Vector3 direction = (mainCamera.transform.position - focusPoint).normalized;
-        Vector3 targetPosition = focusPoint + direction * hoverDistance;
-        Quaternion targetRotation = Quaternion.LookRotation(focusPoint - mainCamera.transform.position);
+        Vector3 targetPosition = new Vector3(
+            focusPoint.x,                    
+            startPosition.y,                 
+            focusPoint.z                     
+        );
 
-        while (Mathf.Abs(mainCamera.fieldOfView - zoomFOV) > 0.01f)
+        // Get target rotation (looking down at object)
+        Quaternion targetRotation = currentObject.transform.rotation;
+
+        while (elapsedTime < duration)
         {
-            // Smoothly adjust the camera's field of view
-            mainCamera.fieldOfView = Mathf.Lerp(mainCamera.fieldOfView, zoomFOV, Time.deltaTime * zoomSpeed);
+            elapsedTime += Time.deltaTime;
+            float t = elapsedTime / duration;
 
-            // Smoothly move the camera into position
-            mainCamera.transform.position = Vector3.Lerp(mainCamera.transform.position, targetPosition, Time.deltaTime * zoomSpeed);
+            // Use smoothstep interpolation for more natural movement
+            float smoothT = t * t * (3f - 2f * t);
 
-            // Smoothly rotate the camera toward the target rotation
-            mainCamera.transform.rotation = Quaternion.Lerp(mainCamera.transform.rotation, targetRotation, Time.deltaTime * zoomSpeed);
+            // Update all camera properties simultaneously
+            mainCamera.fieldOfView = Mathf.Lerp(startFOV, zoomFOV, smoothT);
+            mainCamera.transform.position = Vector3.Lerp(startPosition, targetPosition, smoothT);
+            mainCamera.transform.rotation = Quaternion.Slerp(startRotation, targetRotation, smoothT);
 
             yield return null;
         }
 
-        // Snap to final values to avoid floating-point inaccuracies
+        // Ensure we reach the exact target values
         mainCamera.fieldOfView = zoomFOV;
         mainCamera.transform.position = targetPosition;
         mainCamera.transform.rotation = targetRotation;
 
         isZoomingIn = false;
     }
+
+    // Helper method to calculate the exact position above an object
+    private Vector3 CalculateOverheadPosition(Transform targetTransform)
+    {
+        return new Vector3(
+            targetTransform.position.x,
+            targetTransform.position.y + hoverDistance,
+            targetTransform.position.z
+        );
+    }
+
 
 
     private IEnumerator ResetZoom()
