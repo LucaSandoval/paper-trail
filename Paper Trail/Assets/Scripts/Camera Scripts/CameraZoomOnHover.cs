@@ -15,6 +15,8 @@ public class CameraZoomOnHover : MonoBehaviour
     //private bool isZoomingOut = false;   // Track if zooming out is in progress
     private GameObject currentObject; // Object that is currently the subject
 
+    public bool enabled = false; // Whether or not this method should run 
+
     void Start()
     {
         originalFOV = mainCamera.fieldOfView;
@@ -24,35 +26,39 @@ public class CameraZoomOnHover : MonoBehaviour
 
     void Update()
     {
-        if (isZoomingIn)
+        if (enabled)
         {
-            return; // Dont override IEnumerator during run time
-        }
-
-        Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
-        if (Physics.Raycast(ray, out RaycastHit hit))
-        {
-            GameObject hitObject = hit.transform.gameObject;
-
-            if (hitObject.CompareTag("Paper"))
+            if (isZoomingIn)
             {
-                // If it's a new object, switch focus
-                if (hitObject != currentObject)
+                return; // Dont override IEnumerator during run time
+            }
+
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(ray, out RaycastHit hit))
+            {
+                GameObject hitObject = hit.transform.gameObject;
+
+                if (hitObject.CompareTag("Paper"))
                 {
-                    currentObject = hitObject; // Update the current object
-                    StopAllCoroutines();      // Stop any ongoing zoom animations
-                    Vector3 targPos = CalculateOverheadPosition(currentObject.transform);
-                    StartCoroutine(ZoomToTarget(targPos, 1f));
+                    // If it's a new object, switch focus
+                    if (hitObject != currentObject)
+                    {
+                        currentObject = hitObject; // Update the current object
+                        StopAllCoroutines();      // Stop any ongoing zoom animations
+                        Vector3 targPos = CalculateOverheadPosition(currentObject.transform);
+                        StartCoroutine(ZoomToTarget(targPos, 1f));
+                    }
+                }
+                else if (currentObject != null)
+                {
+                    // If no object is hit but we had a focused object, reset the zoom
+                    currentObject = null; // Clear the current object
+                    StopAllCoroutines();  // Stop any ongoing zoom animations
+                    StartCoroutine(ResetZoom());
                 }
             }
-            else if (currentObject != null)
-            {
-                // If no object is hit but we had a focused object, reset the zoom
-                currentObject = null; // Clear the current object
-                StopAllCoroutines();  // Stop any ongoing zoom animations
-                StartCoroutine(ResetZoom());
-            }
         }
+        
         
     }
 
@@ -133,4 +139,10 @@ public class CameraZoomOnHover : MonoBehaviour
 
         //isZoomingOut = false;
     }
+
+    public void RegisterOriginalCameraSettings(Vector3 origPos, Quaternion origRot) {
+        originalPosition = origPos;
+        originalRotation = origRot;
+    }
+
 }
