@@ -27,16 +27,13 @@ public class WrittingScripts : MonoBehaviour
 
     [Header("Shake Mechanics")]
     public float maxBreathTime = 5f;           // How long you can hold breath
-    public float breathRechargeRate = 0.5f;    // How fast breath meter refills
-    public float maxShakeAmount = 15f;         // Maximum pixel deviation when fully shaking
-    public float minShakeAmount = 2f;          // Minimum shake when just starting to get shaky
+    public float breathRechargeRate = 0.5f;    // How fast breath meter 
+    public float ShakeAmount = 16f;          // Amount the handwritting should shake
     public float shakeSpeed = 10f;             // How fast the shake oscillates
 
     public float currentBreathTime;           // Current breath meter value
     private bool isHoldingBreath;              // Is right-click being held
     private float currentShakeAmount;          // Current shake intensity
-    
-
 
     void Start()
     {
@@ -74,7 +71,7 @@ public class WrittingScripts : MonoBehaviour
         quadRenderer.material.mainTexture = drawingTexture;
 
         currentBreathTime = maxBreathTime;
-        currentShakeAmount = minShakeAmount;
+        currentShakeAmount = ShakeAmount;
     }
 
     void Update()
@@ -179,7 +176,7 @@ public class WrittingScripts : MonoBehaviour
                 currentBreathTime = maxBreathTime;
             }
         }
-        currentShakeAmount = isHoldingBreath ? 0 : maxShakeAmount;
+        currentShakeAmount = isHoldingBreath ? 0 : ShakeAmount;
     }
 
     private Vector2 CalculateShake()
