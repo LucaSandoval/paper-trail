@@ -209,7 +209,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 0.68, y: 0.64, z: 0.00000012102032}
+  m_Size: {x: 1, y: 0.64, z: 0.00000012102032}
   m_Center: {x: 0, y: -0.00000023841858, z: 0}
 --- !u!1 &188431670
 GameObject:
@@ -1494,7 +1494,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1140782005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1518,9 +1518,8 @@ MonoBehaviour:
   WritingSFX: {fileID: 671553902}
   maxBreathTime: 5
   breathRechargeRate: 0.5
-  maxShakeAmount: 15
-  minShakeAmount: 2
-  shakeSpeed: 10
+  ShakeAmount: 36
+  shakeSpeed: 20
   currentBreathTime: 0
 --- !u!64 &1140782006
 MeshCollider:
@@ -8390,6 +8389,14 @@ PrefabInstance:
     - target: {fileID: 1862359361940429398, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_Convex
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 3886320567511119121, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -0.005
+      objectReference: {fileID: 0}
+    - target: {fileID: 3886320567511119121, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.098
       objectReference: {fileID: 0}
     - target: {fileID: 8491322384175256958, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_LocalPosition.x
