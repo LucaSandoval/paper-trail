@@ -12,7 +12,7 @@ public class CameraZoomOnHover : MonoBehaviour
     //public Transform targetObject;       // The object to zoom in on
 
     private bool isZoomingIn = false;    // Track if zooming in is in progress
-    private bool isZoomingOut = false;   // Track if zooming out is in progress
+    //private bool isZoomingOut = false;   // Track if zooming out is in progress
     private GameObject currentObject; // Object that is currently the subject
 
     void Start()
@@ -112,7 +112,7 @@ public class CameraZoomOnHover : MonoBehaviour
 
     private IEnumerator ResetZoom()
     {
-        isZoomingOut = true;
+        //isZoomingOut = true;
 
         while (Mathf.Abs(mainCamera.fieldOfView - originalFOV) > 0.01f)
         {
@@ -131,6 +131,6 @@ public class CameraZoomOnHover : MonoBehaviour
         mainCamera.transform.position = originalPosition;
         mainCamera.transform.rotation = originalRotation;
 
-        isZoomingOut = false;
+        //isZoomingOut = false;
     }
 }

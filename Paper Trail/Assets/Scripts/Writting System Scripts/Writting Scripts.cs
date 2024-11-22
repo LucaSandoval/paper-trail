@@ -23,7 +23,19 @@ public class WrittingScripts : MonoBehaviour
     public AudioSource WritingSFX; 
     private float minPitch = 0.9f;  
     private float maxPitch = 1.1f;  
-    private float pitchSpeedFactor = 0.01f; 
+    private float pitchSpeedFactor = 0.01f;
+
+    [Header("Shake Mechanics")]
+    public float maxBreathTime = 5f;           // How long you can hold breath
+    public float breathRechargeRate = 0.5f;    // How fast breath meter refills
+    public float maxShakeAmount = 15f;         // Maximum pixel deviation when fully shaking
+    public float minShakeAmount = 2f;          // Minimum shake when just starting to get shaky
+    public float shakeSpeed = 10f;             // How fast the shake oscillates
+
+    public float currentBreathTime;           // Current breath meter value
+    private bool isHoldingBreath;              // Is right-click being held
+    private float currentShakeAmount;          // Current shake intensity
+    
 
 
     void Start()
@@ -60,10 +72,15 @@ public class WrittingScripts : MonoBehaviour
         RenderTexture.active = previousRT;
         RenderTexture.ReleaseTemporary(tempRT);
         quadRenderer.material.mainTexture = drawingTexture;
+
+        currentBreathTime = maxBreathTime;
+        currentShakeAmount = minShakeAmount;
     }
 
     void Update()
     {
+        UpdateBreathMechanics();
+
         if (Input.GetMouseButtonDown(0))
         {
             isDrawing = true;
@@ -83,15 +100,23 @@ public class WrittingScripts : MonoBehaviour
                     (int)(pixelUV.y * drawingTexture.height)
                 );
 
+                // Apply shake only when not holding breath
+                if (!isHoldingBreath)
+                {
+                    currentPos += CalculateShake();
+
+                    // Clamp the position to texture boundaries
+                    currentPos.x = Mathf.Clamp(currentPos.x, 0, drawingTexture.width - 1);
+                    currentPos.y = Mathf.Clamp(currentPos.y, 0, drawingTexture.height - 1);
+                }
+
                 if (previousDrawPosition.HasValue)
                 {
                     float deltaTime = Time.time - lastDrawTime;
                     Vector2 velocity = (currentPos - previousDrawPosition.Value) / deltaTime;
                     lastVelocity = Vector2.Lerp(lastVelocity, velocity, smoothingFactor);
-
                     DrawImprovedLine(previousDrawPosition.Value, currentPos, lastVelocity.magnitude);
 
-                    //SOUND EFFECTS, play speed change on player's writing speed change
                     float speed = lastVelocity.magnitude;
                     float normalizedSpeed = Mathf.Clamp(speed / maxSpeed, 0, 1);
                     WritingSFX.pitch = Mathf.Lerp(minPitch, maxPitch, normalizedSpeed);
@@ -100,7 +125,6 @@ public class WrittingScripts : MonoBehaviour
                     {
                         WritingSFX.Play();
                     }
-
                 }
                 else
                 {
@@ -124,6 +148,48 @@ public class WrittingScripts : MonoBehaviour
         }
     }
 
+    private void UpdateBreathMechanics()
+    {
+        // Check for right-click (holding breath)
+        if (Input.GetMouseButtonDown(1) && currentBreathTime > 0)
+        {
+            isHoldingBreath = true;
+        }
+
+        if (Input.GetMouseButtonUp(1))
+        {
+            isHoldingBreath = false;
+        }
+
+        // Update breath meter
+        if (isHoldingBreath)
+        {
+            currentBreathTime -= Time.deltaTime;
+            if (currentBreathTime <= 0)
+            {
+                currentBreathTime = 0;
+                isHoldingBreath = false;
+            }
+        }
+        else
+        {
+            currentBreathTime += Time.deltaTime * breathRechargeRate;
+            if (currentBreathTime >= maxBreathTime)
+            {
+                currentBreathTime = maxBreathTime;
+            }
+        }
+        currentShakeAmount = isHoldingBreath ? 0 : maxShakeAmount;
+    }
+
+    private Vector2 CalculateShake()
+    {
+        float time = Time.time * shakeSpeed;
+        return new Vector2(
+            Mathf.PerlinNoise(time, 0) * currentShakeAmount - (currentShakeAmount * 0.5f),
+            Mathf.PerlinNoise(0, time) * currentShakeAmount - (currentShakeAmount * 0.5f)
+        );
+    }
     void DrawImprovedLine(Vector2 start, Vector2 end, float speed)
     {
         float distance = Vector2.Distance(start, end);
