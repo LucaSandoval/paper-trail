@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311924, g: 0.38073963, b: 0.3587269, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -1275,13 +1275,14 @@ GameObject:
   - component: {fileID: 1140782007}
   - component: {fileID: 1140782006}
   - component: {fileID: 1140782005}
+  - component: {fileID: 1140782010}
   m_Layer: 0
   m_Name: Paper
-  m_TagString: Untagged
+  m_TagString: Paper
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1140782005
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1390,6 +1391,22 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6775723374937934604}
   m_LocalEulerAnglesHint: {x: 90, y: 180, z: 10.981003}
+--- !u!114 &1140782010
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1140782004}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b7acc6be11f0744778bfdd7f28f29472, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  mainCamera: {fileID: 1545335641}
+  zoomSpeed: 5
+  zoomFOV: 40
+  hoverDistance: 1.5
 --- !u!1 &1236230089
 GameObject:
   m_ObjectHideFlags: 0
@@ -8045,6 +8062,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 302095030830512785, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
+      propertyPath: m_TagString
+      value: Paper
+      objectReference: {fileID: 0}
     - target: {fileID: 8491322384175256958, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.594
