@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 public class BreathMeter : MonoBehaviour
 {
-    private WrittingScripts breathScript;
+    private OptimizedWrittingScripts breathScript;
     private Slider meter;
     private CanvasGroup canvasGroup;
     private float fadeSpeed = 2f; // Speed at which the meter fades
@@ -14,7 +14,7 @@ public class BreathMeter : MonoBehaviour
 
     void Start()
     {
-        breathScript = GameObject.FindObjectOfType<WrittingScripts>();
+        breathScript = GameObject.FindObjectOfType<OptimizedWrittingScripts>();
         meter = GetComponent<Slider>();
         canvasGroup = GetComponent<CanvasGroup>();
 

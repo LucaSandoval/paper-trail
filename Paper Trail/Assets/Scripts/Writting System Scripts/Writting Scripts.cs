@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class WrittingScripts : MonoBehaviour
+public class OptimizedWrittingScripts : MonoBehaviour
 {
+    [Header("Drawing Components")]
     public Renderer quadRenderer;
     public Color brushColor = Color.black;
     public int brushSize = 5;
@@ -13,71 +14,102 @@ public class WrittingScripts : MonoBehaviour
     public float smoothingFactor = 0.3f;
     public Texture2D referenceTexture;
 
+    [Header("Audio Settings")]
+    public AudioSource WritingSFX;
+    public float minPitch = 0.9f;
+    public float maxPitch = 1.1f;
+
+    [Header("Shake Mechanics")]
+    public float maxBreathTime = 5f;
+    public float breathRechargeRate = 0.5f;
+    public float ShakeAmount = 16f;
+    public float shakeSpeed = 10f;
+
+    // Cached components and optimization variables
     private Texture2D drawingTexture;
+    private Camera mainCamera;
+    private Color[] brushPixels;
+    private Color[] texturePixels;
+    private int textureWidth;
+    private int textureHeight;
+
+    // Optimization variables
     private Vector2? previousDrawPosition = null;
     private bool isDrawing = false;
     private float lastDrawTime;
     private Vector2 lastVelocity = Vector2.zero;
 
-    //AudioChangeOnWriting
-    public AudioSource WritingSFX; 
-    private float minPitch = 0.9f;  
-    private float maxPitch = 1.1f;  
-    private float pitchSpeedFactor = 0.01f;
+    // Breath and shake variables
+    public float currentBreathTime;
+    public bool isHoldingBreath;
+    private float currentShakeAmount;
 
-    [Header("Shake Mechanics")]
-    public float maxBreathTime = 5f;           // How long you can hold breath
-    public float breathRechargeRate = 0.5f;    // How fast breath meter 
-    public float ShakeAmount = 16f;          // Amount the handwritting should shake
-    public float shakeSpeed = 10f;             // How fast the shake oscillates
+    void Awake()
+    {
+        // Cache main camera for performance
+        mainCamera = Camera.main;
 
-    public float currentBreathTime;           // Current breath meter value
-    private bool isHoldingBreath;              // Is right-click being held
-    private float currentShakeAmount;          // Current shake intensity
+        // Pre-calculate brush pixels to reduce allocation
+        PrepareBrushPixels();
+    }
 
     void Start()
     {
-        // Get the existing texture from the material
-        Texture existingTexture = quadRenderer.material.mainTexture;
-
-        // Create a new texture with the same dimensions
-        drawingTexture = new Texture2D(existingTexture.width, existingTexture.height, TextureFormat.RGBA32, false);
-        drawingTexture.filterMode = FilterMode.Point;
-
-        // Create a temporary RenderTexture to copy the existing texture
-        RenderTexture tempRT = RenderTexture.GetTemporary(
-            existingTexture.width,
-            existingTexture.height,
-            0,
-            RenderTextureFormat.Default,
-            RenderTextureReadWrite.Linear
-        );
-
-        // Copy the existing texture to the temporary RenderTexture
-        Graphics.Blit(existingTexture, tempRT);
-
-        // Store the active RenderTexture
-        RenderTexture previousRT = RenderTexture.active;
-
-        // Set the temporary RenderTexture as active
-        RenderTexture.active = tempRT;
-
-        // Copy the pixels from the RenderTexture to our new texture
-        drawingTexture.ReadPixels(new Rect(0, 0, tempRT.width, tempRT.height), 0, 0);
-        drawingTexture.Apply();
-
-        RenderTexture.active = previousRT;
-        RenderTexture.ReleaseTemporary(tempRT);
-        quadRenderer.material.mainTexture = drawingTexture;
+        InitializeDrawingTexture();
 
         currentBreathTime = maxBreathTime;
         currentShakeAmount = ShakeAmount;
     }
 
+    void PrepareBrushPixels()
+    {
+        // Pre-allocate and calculate brush pixels
+        int maxBrushSize = Mathf.CeilToInt(brushSize * splotchFactor);
+        int arraySize = (maxBrushSize * 2 + 1) * (maxBrushSize * 2 + 1);
+        brushPixels = new Color[arraySize];
+    }
+
+    void InitializeDrawingTexture()
+    {
+        Texture existingTexture = quadRenderer.material.mainTexture;
+        textureWidth = existingTexture.width;
+        textureHeight = existingTexture.height;
+
+        drawingTexture = new Texture2D(textureWidth, textureHeight, TextureFormat.RGBA32, false);
+        drawingTexture.filterMode = FilterMode.Point;
+
+        RenderTexture tempRT = RenderTexture.GetTemporary(
+            textureWidth,
+            textureHeight,
+            0,
+            RenderTextureFormat.Default,
+            RenderTextureReadWrite.Linear
+        );
+
+        Graphics.Blit(existingTexture, tempRT);
+        RenderTexture previousRT = RenderTexture.active;
+        RenderTexture.active = tempRT;
+
+        drawingTexture.ReadPixels(new Rect(0, 0, tempRT.width, tempRT.height), 0, 0);
+        drawingTexture.Apply();
+
+        // Store pixel array for faster access
+        texturePixels = drawingTexture.GetPixels();
+
+        RenderTexture.active = previousRT;
+        RenderTexture.ReleaseTemporary(tempRT);
+
+        quadRenderer.material.mainTexture = drawingTexture;
+    }
+
     void Update()
     {
         UpdateBreathMechanics();
+        HandleDrawing();
+    }
 
+    void HandleDrawing()
+    {
         if (Input.GetMouseButtonDown(0))
         {
             isDrawing = true;
@@ -86,25 +118,23 @@ public class WrittingScripts : MonoBehaviour
 
         if (Input.GetMouseButton(0) && isDrawing)
         {
-            Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+            Ray ray = mainCamera.ScreenPointToRay(Input.mousePosition);
             RaycastHit hit;
 
             if (Physics.Raycast(ray, out hit) && hit.collider.gameObject == quadRenderer.gameObject)
             {
                 Vector2 pixelUV = hit.textureCoord;
                 Vector2 currentPos = new Vector2(
-                    (int)(pixelUV.x * drawingTexture.width),
-                    (int)(pixelUV.y * drawingTexture.height)
+                    (int)(pixelUV.x * textureWidth),
+                    (int)(pixelUV.y * textureHeight)
                 );
 
                 // Apply shake only when not holding breath
                 if (!isHoldingBreath)
                 {
                     currentPos += CalculateShake();
-
-                    // Clamp the position to texture boundaries
-                    currentPos.x = Mathf.Clamp(currentPos.x, 0, drawingTexture.width - 1);
-                    currentPos.y = Mathf.Clamp(currentPos.y, 0, drawingTexture.height - 1);
+                    currentPos.x = Mathf.Clamp(currentPos.x, 0, textureWidth - 1);
+                    currentPos.y = Mathf.Clamp(currentPos.y, 0, textureHeight - 1);
                 }
 
                 if (previousDrawPosition.HasValue)
@@ -147,7 +177,6 @@ public class WrittingScripts : MonoBehaviour
 
     private void UpdateBreathMechanics()
     {
-        // Check for right-click (holding breath)
         if (Input.GetMouseButtonDown(1) && currentBreathTime > 0)
         {
             isHoldingBreath = true;
@@ -158,24 +187,11 @@ public class WrittingScripts : MonoBehaviour
             isHoldingBreath = false;
         }
 
-        // Update breath meter
-        if (isHoldingBreath)
-        {
-            currentBreathTime -= Time.deltaTime;
-            if (currentBreathTime <= 0)
-            {
-                currentBreathTime = 0;
-                isHoldingBreath = false;
-            }
-        }
-        else
-        {
-            currentBreathTime += Time.deltaTime * breathRechargeRate;
-            if (currentBreathTime >= maxBreathTime)
-            {
-                currentBreathTime = maxBreathTime;
-            }
-        }
+        currentBreathTime += isHoldingBreath
+            ? -Time.deltaTime
+            : Time.deltaTime * breathRechargeRate;
+
+        currentBreathTime = Mathf.Clamp(currentBreathTime, 0, maxBreathTime);
         currentShakeAmount = isHoldingBreath ? 0 : ShakeAmount;
     }
 
@@ -187,6 +203,7 @@ public class WrittingScripts : MonoBehaviour
             Mathf.PerlinNoise(0, time) * currentShakeAmount - (currentShakeAmount * 0.5f)
         );
     }
+
     void DrawImprovedLine(Vector2 start, Vector2 end, float speed)
     {
         float distance = Vector2.Distance(start, end);
@@ -216,7 +233,9 @@ public class WrittingScripts : MonoBehaviour
             DrawAtPosition((int)pos.x, (int)pos.y, currentBrushSize);
         }
 
-        drawingTexture.Apply();
+        // Batch apply pixels for better performance
+        drawingTexture.SetPixels(texturePixels);
+        drawingTexture.Apply(false);
     }
 
     void DrawAtPosition(int x, int y, int customBrushSize)
@@ -232,15 +251,17 @@ public class WrittingScripts : MonoBehaviour
                     int newX = x + i;
                     int newY = y + j;
 
-                    if (newX >= 0 && newX < drawingTexture.width &&
-                        newY >= 0 && newY < drawingTexture.height)
+                    if (newX >= 0 && newX < textureWidth &&
+                        newY >= 0 && newY < textureHeight)
                     {
+                        int pixelIndex = newY * textureWidth + newX;
                         float distanceFromCenter = (i * i + j * j) / (float)brushSizeSquared;
+
                         Color pixelColor = brushColor;
                         pixelColor.a = Mathf.Lerp(1f, 0.7f, distanceFromCenter);
 
-                        Color existingColor = drawingTexture.GetPixel(newX, newY);
-                        drawingTexture.SetPixel(newX, newY, Color.Lerp(existingColor, pixelColor, pixelColor.a));
+                        Color existingColor = texturePixels[pixelIndex];
+                        texturePixels[pixelIndex] = Color.Lerp(existingColor, pixelColor, pixelColor.a);
                     }
                 }
             }
@@ -251,62 +272,49 @@ public class WrittingScripts : MonoBehaviour
     {
         int splotchSize = (int)(brushSize * splotchFactor);
         DrawAtPosition(x, y, splotchSize);
-        drawingTexture.Apply();
+
+        // Batch apply pixels
+        drawingTexture.SetPixels(texturePixels);
+        drawingTexture.Apply(false);
     }
 
     public void ClearTexture()
     {
-        // Get the existing texture from the material
-        Texture originalTexture = quadRenderer.material.GetTexture("_MainTex");
-
-        // Create a temporary RenderTexture
-        RenderTexture tempRT = RenderTexture.GetTemporary(
-            originalTexture.width,
-            originalTexture.height,
-            0,
-            RenderTextureFormat.Default,
-            RenderTextureReadWrite.Linear
-        );
-
-        // Copy the original texture to the temporary RenderTexture
-        Graphics.Blit(originalTexture, tempRT);
-        RenderTexture previousRT = RenderTexture.active;
-        RenderTexture.active = tempRT;
-        drawingTexture.ReadPixels(new Rect(0, 0, tempRT.width, tempRT.height), 0, 0);
-        drawingTexture.Apply();
-        RenderTexture.active = previousRT;
-        RenderTexture.ReleaseTemporary(tempRT);
+        // Use the pre-cached texture initialization method
+        InitializeDrawingTexture();
     }
 
     public float CompareTextures(Texture2D texture1, Texture2D texture2)
     {
         int matchedBlackPixels = 0;
         int totalBlackPixelsReference = 0;
-        float blackPixelThreshold = 0.1f; 
+        float blackPixelThreshold = 0.1f;
 
-        for (int x = 0; x < texture1.width; x++)
+        // Use Color[] for faster pixel access
+        Color[] pixels1 = texture1.GetPixels();
+        Color[] pixels2 = texture2.GetPixels();
+
+        for (int i = 0; i < pixels1.Length; i++)
         {
-            for (int y = 0; y < texture1.height; y++)
-            {
-                Color color1 = texture1.GetPixel(x, y);
-                Color color2 = texture2.GetPixel(x, y);
+            bool isBlack1 = pixels1[i].r < blackPixelThreshold &&
+                            pixels1[i].g < blackPixelThreshold &&
+                            pixels1[i].b < blackPixelThreshold;
 
-                bool isBlack1 = color1.r < blackPixelThreshold && color1.g < blackPixelThreshold && color1.b < blackPixelThreshold;
-                bool isBlack2 = color2.r < blackPixelThreshold && color2.g < blackPixelThreshold && color2.b < blackPixelThreshold;
+            bool isBlack2 = pixels2[i].r < blackPixelThreshold &&
+                            pixels2[i].g < blackPixelThreshold &&
+                            pixels2[i].b < blackPixelThreshold;
 
-                // Count total black pixels in reference texture
-                if (isBlack1)
-                    totalBlackPixelsReference++;
+            // Count total black pixels in reference texture
+            if (isBlack1)
+                totalBlackPixelsReference++;
 
-                // Increment if pixels from both images are black
-                if (isBlack1 && isBlack2)
-                    matchedBlackPixels++;
-            }
+            // Increment if pixels from both images are black
+            if (isBlack1 && isBlack2)
+                matchedBlackPixels++;
         }
-        
+
         return (float)matchedBlackPixels / totalBlackPixelsReference;
     }
-
 
     public void CompareSignatures()
     {
@@ -330,6 +338,3 @@ public class WrittingScripts : MonoBehaviour
         Debug.Log("Texture saved to: " + filePath);
     }
 }
-
-
-
