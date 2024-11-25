@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections;
+using UnityEngine.UI;
 
 public class CameraIntroPan : MonoBehaviour
 {
@@ -62,11 +63,13 @@ public class CameraIntroPan : MonoBehaviour
         gameElements.enabled = true;
         CanvasGroup canvasGroup = gameElements.GetComponent<CanvasGroup>();
         float elapsedTime = 0f;
+        Slider slide = gameElements.GetComponentInChildren<Slider>();
 
         while (elapsedTime < fadeDuration)
         {
             elapsedTime += Time.deltaTime;
             canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsedTime / fadeDuration);
+            slide.GetComponent<CanvasGroup>().alpha = 0;
             yield return null;
         }
         canvasGroup.alpha = 1f;
