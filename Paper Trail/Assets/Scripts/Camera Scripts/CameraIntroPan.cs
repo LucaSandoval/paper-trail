@@ -30,6 +30,7 @@ public class CameraIntroPan : MonoBehaviour
             transform.position = startPoint.position;
             StartCoroutine(PanToDefault());
         }
+        gameElements.enabled = false;
     }
 
     private IEnumerator PanToDefault()
@@ -58,6 +59,7 @@ public class CameraIntroPan : MonoBehaviour
 
     private IEnumerator FadeInElements()
     {
+        gameElements.enabled = true;
         CanvasGroup canvasGroup = gameElements.GetComponent<CanvasGroup>();
         float elapsedTime = 0f;
 

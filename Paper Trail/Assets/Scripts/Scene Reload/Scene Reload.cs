@@ -5,14 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class SceneReload : MonoBehaviour
 {
-
-   
-    // Update is called once per frame
-    void Update()
+    public void RestartScene()
     {
-        if (Input.GetKeyDown(KeyCode.R))
-        {
-            SceneManager.LoadScene(0);
-        }
+        SceneManager.LoadScene(0);
     }
 }
