@@ -2098,7 +2098,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1140782004}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 69cb8434b3e61478693a125f9c2d9c7d, type: 3}
   m_Name: 
@@ -2112,11 +2112,14 @@ MonoBehaviour:
   smoothingFactor: 0.05
   referenceTexture: {fileID: 2800000, guid: 1ace07bb616e2984a8591ddd23c7cc2f, type: 3}
   WritingSFX: {fileID: 671553902}
+  minPitch: 0.9
+  maxPitch: 1.1
   maxBreathTime: 5
   breathRechargeRate: 0.5
   ShakeAmount: 36
   shakeSpeed: 20
   currentBreathTime: 0
+  isHoldingBreath: 0
 --- !u!64 &1140782006
 MeshCollider:
   m_ObjectHideFlags: 0

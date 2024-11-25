@@ -75,6 +75,7 @@ public class CameraIntroPan : MonoBehaviour
         {
             cam.enabled = true;
             cam.RegisterOriginalCameraSettings(originalPosition, originalRotation);
+            FindObjectOfType<OptimizedWrittingScripts>().enabled = true;
         }
     }
 }
