@@ -312,7 +312,7 @@ public class WrittingScripts : MonoBehaviour
     {
         //SaveTextureToFile(drawingTexture, "NewSignature.png");
         float similarityScore = CompareTextures(drawingTexture, referenceTexture);
-        Debug.Log("Similarity: " + (similarityScore * 100f) + "%");
+        Debug.Log("Similarity: " + (similarityScore * 1500f) + "%");
     }
 
     public void SaveTextureToFile(Texture2D texture, string fileName)
