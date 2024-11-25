@@ -52,14 +52,6 @@ public class CameraIntroPan : MonoBehaviour
         transform.position = originalPosition;
         transform.rotation = originalRotation;
 
-        // Enable the camera zoom functionality
-        CameraZoomOnHover cam = FindObjectOfType<CameraZoomOnHover>();
-        if (cam != null)
-        {
-            cam.enabled = true;
-            cam.RegisterOriginalCameraSettings(originalPosition, originalRotation);
-        }
-
         // Start fading in the game UI elements
         StartCoroutine(FadeInElements());
     }
@@ -76,5 +68,13 @@ public class CameraIntroPan : MonoBehaviour
             yield return null;
         }
         canvasGroup.alpha = 1f;
+
+        // Enable the camera zoom functionality
+        CameraZoomOnHover cam = FindObjectOfType<CameraZoomOnHover>();
+        if (cam != null)
+        {
+            cam.enabled = true;
+            cam.RegisterOriginalCameraSettings(originalPosition, originalRotation);
+        }
     }
 }

@@ -9,10 +9,11 @@ public class CameraZoomOnHover : MonoBehaviour
     private float originalFOV = 60f;     // Original field of view
     private Vector3 originalPosition;    // Original camera position
     private Quaternion originalRotation; // Original camera rotation
-    //public Transform targetObject;       // The object to zoom in on
+    public Canvas gameUI; // UI that isnt related to control scheme
+    public float fadeDuration = 2;
 
     private bool isZoomingIn = false;    // Track if zooming in is in progress
-    //private bool isZoomingOut = false;   // Track if zooming out is in progress
+    
     private GameObject currentObject; // Object that is currently the subject
 
     public bool enabled = false; // Whether or not this method should run 
@@ -22,6 +23,12 @@ public class CameraZoomOnHover : MonoBehaviour
         originalFOV = mainCamera.fieldOfView;
         originalPosition = mainCamera.transform.position;
         originalRotation = mainCamera.transform.rotation;
+
+        CanvasGroup canvasGroup = gameUI.GetComponent<CanvasGroup>();
+        if (canvasGroup == null)
+        {
+            canvasGroup = gameUI.gameObject.AddComponent<CanvasGroup>();
+        }
     }
 
     void Update()
@@ -64,6 +71,7 @@ public class CameraZoomOnHover : MonoBehaviour
 
     private IEnumerator ZoomToTarget(Vector3 focusPoint, float duration = 1f)
     {
+        StartCoroutine(FadeOutElements());
         isZoomingIn = true;
         float elapsedTime = 0f;
 
@@ -118,8 +126,7 @@ public class CameraZoomOnHover : MonoBehaviour
 
     private IEnumerator ResetZoom()
     {
-        //isZoomingOut = true;
-
+        StartCoroutine(FadeInElements());
         while (Mathf.Abs(mainCamera.fieldOfView - originalFOV) > 0.01f)
         {
             // Smoothly reset the camera's field of view
@@ -136,8 +143,6 @@ public class CameraZoomOnHover : MonoBehaviour
         mainCamera.fieldOfView = originalFOV;
         mainCamera.transform.position = originalPosition;
         mainCamera.transform.rotation = originalRotation;
-
-        //isZoomingOut = false;
     }
 
     public void RegisterOriginalCameraSettings(Vector3 origPos, Quaternion origRot) {
@@ -145,4 +150,31 @@ public class CameraZoomOnHover : MonoBehaviour
         originalRotation = origRot;
     }
 
+    private IEnumerator FadeInElements()
+    {
+        CanvasGroup canvasGroup = gameUI.GetComponent<CanvasGroup>();
+        float elapsedTime = 0f;
+
+        while (elapsedTime < fadeDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            canvasGroup.alpha = Mathf.Lerp(0f, 1f, elapsedTime / fadeDuration);
+            yield return null;
+        }
+        canvasGroup.alpha = 1f;
+    }
+
+    private IEnumerator FadeOutElements()
+    {
+        CanvasGroup canvasGroup = gameUI.GetComponent<CanvasGroup>();
+        float elapsedTime = 0f;
+
+        while (elapsedTime < fadeDuration)
+        {
+            elapsedTime += Time.deltaTime;
+            canvasGroup.alpha = Mathf.Lerp(1f, 0f, elapsedTime / fadeDuration);
+            yield return null;
+        }
+        canvasGroup.alpha = 0f;
+    }
 }
