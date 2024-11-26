@@ -983,7 +983,6 @@ GameObject:
   - component: {fileID: 422474309}
   - component: {fileID: 422474308}
   - component: {fileID: 422474307}
-  - component: {fileID: 422474305}
   m_Layer: 0
   m_Name: desk_paper
   m_TagString: Paper
@@ -1006,25 +1005,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 680761983}
   m_LocalEulerAnglesHint: {x: 90, y: 180, z: 0.6179962}
---- !u!114 &422474305
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 422474303}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b7acc6be11f0744778bfdd7f28f29472, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mainCamera: {fileID: 1545335641}
-  zoomSpeed: 5
-  zoomFOV: 25
-  hoverDistance: 0.5
-  gameUI: {fileID: 0}
-  fadeDuration: 2
-  enabled: 0
 --- !u!64 &422474307
 MeshCollider:
   m_ObjectHideFlags: 0
