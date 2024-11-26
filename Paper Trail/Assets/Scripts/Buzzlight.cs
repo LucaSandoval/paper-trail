@@ -13,7 +13,8 @@ public class Buzzlight : MonoBehaviour
     public int maxCount = 4; 
     public float flashCooldown = 10f; 
     private bool isFlashing = false;
-    
+    private bool isEnabled = true;
+
     void Start()
     {
         InvokeRepeating(nameof(StartFlash), 0f, flashCooldown);
@@ -21,7 +22,7 @@ public class Buzzlight : MonoBehaviour
 
     public void StartFlash()
     {
-        if (!isFlashing)
+        if (!isFlashing && isEnabled)
         {
             StartCoroutine(flashRoutine());
         }
@@ -34,6 +35,8 @@ public class Buzzlight : MonoBehaviour
         int flashCount = Random.Range(minCount, maxCount + 1);
         for (int i = 0; i < flashCount; i++)
         {
+            if (!isEnabled) break;
+
             if (i % 2 == 0)
             {
                 buzzAudio.Play();
@@ -46,6 +49,19 @@ public class Buzzlight : MonoBehaviour
         // Return to default
         spotlight.intensity = 2.2f;
         isFlashing = false;
+    }
+
+    //for complete button
+    public void SetEnabled(bool enabled)
+    {
+        isEnabled = enabled;
+
+        if (!isEnabled)
+        {
+            StopAllCoroutines();
+            spotlight.intensity = 2.2f; 
+            buzzAudio.Stop();
+        }
     }
 
 }
