@@ -38,7 +38,7 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0.37311924, g: 0.38073963, b: 0.3587269, a: 1}
+  m_IndirectSpecularColor: {r: 0.37311953, g: 0.38074014, b: 0.3587274, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -990,7 +990,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &422474304
 Transform:
   m_ObjectHideFlags: 0
@@ -1000,7 +1000,7 @@ Transform:
   m_GameObject: {fileID: 422474303}
   serializedVersion: 2
   m_LocalRotation: {x: 0.0038140381, y: 0.7070965, z: -0.7070965, w: 0.003814053}
-  m_LocalPosition: {x: -0.008, y: 0.0029102564, z: -0.088}
+  m_LocalPosition: {x: -0.008, y: -0.003, z: -0.088}
   m_LocalScale: {x: 1.1542487, y: 0.7669252, z: 2.669988}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1067,7 +1067,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 746a1e387d36731468e963571d4f7630, type: 2}
+  - {fileID: 2100000, guid: 8648cfd544a1c8a418ace455e4db15cb, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -2122,7 +2122,7 @@ MonoBehaviour:
   minSpeedScale: 0.8
   maxSpeed: 1000
   smoothingFactor: 0.05
-  referenceTexture: {fileID: 2800000, guid: 1ace07bb616e2984a8591ddd23c7cc2f, type: 3}
+  referenceTexture: {fileID: 2800000, guid: fced99672b365a440aca86d726cc251c, type: 3}
   WritingSFX: {fileID: 671553902}
   minPitch: 0.9
   maxPitch: 1.1
@@ -9338,7 +9338,7 @@ PrefabInstance:
     - target: {fileID: 1852585893192284375, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_Materials.Array.data[0]
       value: 
-      objectReference: {fileID: 2100000, guid: 87d9d1a94d9ca9b43b99421c7eb6d4a1, type: 2}
+      objectReference: {fileID: 2100000, guid: 147273d44a677bb4eae8bffefd808317, type: 2}
     - target: {fileID: 1862359361940429398, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_Convex
       value: 1
@@ -9353,31 +9353,31 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3886320567511119121, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.03699997
+      value: 0.04
       objectReference: {fileID: 0}
     - target: {fileID: 3886320567511119121, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -0
       objectReference: {fileID: 0}
     - target: {fileID: 3886320567511119121, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.2210001
+      value: -0.119
       objectReference: {fileID: 0}
     - target: {fileID: 3886320567511119121, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 0.06142416
+      value: -0.0033718566
       objectReference: {fileID: 0}
     - target: {fileID: 3886320567511119121, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0.061424203
+      value: -0.003371812
       objectReference: {fileID: 0}
     - target: {fileID: 3886320567511119121, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_LocalRotation.y
-      value: -0.70443386
+      value: -0.7070988
       objectReference: {fileID: 0}
     - target: {fileID: 3886320567511119121, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_LocalRotation.z
-      value: 0.70443386
+      value: 0.7070988
       objectReference: {fileID: 0}
     - target: {fileID: 3886320567511119121, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
@@ -9389,7 +9389,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3886320567511119121, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
-      value: 170.033
+      value: 180.546
       objectReference: {fileID: 0}
     - target: {fileID: 8491322384175256958, guid: 8fec4d3b56020204fa65e2e6e6da9f1d, type: 3}
       propertyPath: m_LocalScale.x

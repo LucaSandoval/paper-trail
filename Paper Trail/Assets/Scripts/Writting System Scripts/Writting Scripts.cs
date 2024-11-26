@@ -293,8 +293,8 @@ public class OptimizedWrittingScripts : MonoBehaviour
         float blackPixelThreshold = 0.1f;
 
         // Use Color[] for faster pixel access
-        Color[] pixels1 = texture1.GetPixels();
-        Color[] pixels2 = texture2.GetPixels();
+        Color[] pixels2 = texture1.GetPixels();
+        Color[] pixels1 = texture2.GetPixels();
 
         for (int i = 0; i < pixels1.Length; i++)
         {
@@ -322,8 +322,7 @@ public class OptimizedWrittingScripts : MonoBehaviour
     {
         //SaveTextureToFile(drawingTexture, "NewSignature.png");
         float similarityScore = CompareTextures(drawingTexture, referenceTexture);
-        storedScore = similarityScore * 1500f;
-        Debug.Log("Similarity: " + (similarityScore * 1500f) + "%");
+        storedScore = similarityScore * 100f;
     }
 
     public void SaveTextureToFile(Texture2D texture, string fileName)
