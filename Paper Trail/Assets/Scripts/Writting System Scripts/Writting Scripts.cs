@@ -44,6 +44,8 @@ public class OptimizedWrittingScripts : MonoBehaviour
     public bool isHoldingBreath;
     private float currentShakeAmount;
 
+    public float storedScore = 0;
+
     void Awake()
     {
         // Cache main camera for performance
@@ -320,6 +322,7 @@ public class OptimizedWrittingScripts : MonoBehaviour
     {
         //SaveTextureToFile(drawingTexture, "NewSignature.png");
         float similarityScore = CompareTextures(drawingTexture, referenceTexture);
+        storedScore = similarityScore * 1500f;
         Debug.Log("Similarity: " + (similarityScore * 1500f) + "%");
     }
 
